@@ -14,6 +14,8 @@
     .section{margin:36px 0}.section h2{font-size:23px;letter-spacing:-.5px;margin:0 0 7px}.section .hint{color:var(--muted);margin:0 0 18px;font-size:14px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{border:1px solid var(--border);border-radius:15px;background:linear-gradient(145deg,var(--panel),#0e182a);padding:21px;min-width:0}.card .label{color:var(--muted);font-size:13px}.card .value{font-size:22px;font-weight:800;overflow-wrap:anywhere;margin-top:12px}.card .detail{font-size:12px;color:var(--muted);margin-top:7px}.status{display:inline-flex;align-items:center;gap:7px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--amber)}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}.dot.wait{background:var(--amber)}
     .pipeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.step{position:relative;padding:22px 16px;background:var(--panel);border:1px solid var(--border);border-radius:14px}.step .num{font-size:12px;color:var(--blue);font-weight:800}.step h3{font-size:18px;margin:10px 0 6px}.step p{color:var(--muted);font-size:13px;margin:0}.step:not(:last-child)::after{content:'→';position:absolute;right:-12px;top:43%;z-index:2;color:var(--green);font-weight:900;background:var(--bg);padding:0 2px}
     .two{display:grid;grid-template-columns:1.4fr 1fr;gap:15px}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.info{display:grid;grid-template-columns:125px 1fr;gap:12px;border-bottom:1px solid var(--border);padding:12px 0;font-size:14px}.info:last-child{border-bottom:0}.info dt{color:var(--muted)}.info dd{margin:0;overflow-wrap:anywhere}.tech{display:flex;flex-wrap:wrap;gap:9px}.tag{background:#20304a;color:#d6e8ff;border:1px solid #344965;padding:7px 11px;border-radius:8px;font-size:13px}.note{border-left:3px solid var(--blue);padding:12px 15px;background:#14243a;color:var(--muted);font-size:13px;border-radius:0 9px 9px 0;margin-top:18px}.footer{border-top:1px solid var(--border);padding:25px 0;color:var(--muted);font-size:13px;margin-top:60px}.footer .wrap{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+    .hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr);align-items:center;gap:35px;min-height:410px}.hero-copy{min-width:0}.hero-visual{width:100%;max-width:470px;justify-self:center;position:relative;filter:drop-shadow(0 0 25px #1c78dd22)}.hero-visual svg{width:100%;height:auto;display:block;overflow:visible}.infinity-track{fill:none;stroke:#223657;stroke-width:13;stroke-linecap:round}.infinity-glow{fill:none;stroke:url(#infinity-gradient);stroke-width:17;filter:url(#infinity-blur);opacity:.32}.infinity-flow{fill:none;stroke:url(#infinity-gradient);stroke-width:13;stroke-linecap:round;stroke-dasharray:105 880;animation:infinity-run 3.4s linear infinite}.infinity-label{font-size:24px;font-weight:800;fill:#e6f0ff;letter-spacing:2px}.infinity-caption{text-align:center;font-size:10px;font-weight:700;letter-spacing:2px;color:#8ba6c8;margin-top:-10px}.infinity-caption span{color:#3dd6a1}@keyframes infinity-run{to{stroke-dashoffset:-985}}@media(prefers-reduced-motion:reduce){.infinity-flow{animation:none;stroke-dasharray:none}}
+    @media(max-width:950px){.hero{grid-template-columns:1fr}.hero-visual{max-width:390px}.hero{gap:12px}}
     @media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.pipeline{grid-template-columns:repeat(2,1fr)}.step::after{display:none}.two{grid-template-columns:1fr}.hero{padding-top:50px}}
     @media(max-width:480px){.nav{align-items:flex-start;flex-direction:column}.cards,.pipeline{grid-template-columns:1fr}.info{grid-template-columns:1fr;gap:2px}.hero h1{letter-spacing:-1px}}
   </style>
@@ -21,7 +23,19 @@
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="#inicio">&lt;DevOps<span>/</span>Pipeline&gt;</a><nav class="navlinks" aria-label="Navegação"><a href="#dashboard">Dashboard</a><a href="#pipeline">Pipeline</a><a href="#arquitetura">Arquitetura</a></nav></div></header>
 <main class="wrap" id="inicio">
-  <section class="hero"><div class="eyebrow">Projeto final • DevOps</div><h1>Integração e entrega<br><span>contínua na prática.</span></h1><p>Uma aplicação estática publicada na Cloudflare, com versionamento Git e validação automatizada via GitHub Actions. Acompanhe abaixo a execução mais recente do workflow.</p><div class="actions"><a class="btn primary" id="repoLink" href="#configuracao" target="_self">Ver repositório ↗</a><a class="btn" id="actionsLink" href="#configuracao">Ver GitHub Actions ↗</a><a class="btn" href="#pipeline">Explorar pipeline ↓</a></div></section>
+  <section class="hero">
+    <div class="hero-copy"><div class="eyebrow">Projeto final • DevOps</div><h1>Integração e entrega<br><span>contínua na prática.</span></h1><p>Uma aplicação estática publicada na Cloudflare, com versionamento Git e validação automatizada via GitHub Actions. Acompanhe abaixo a execução mais recente do workflow.</p><div class="actions"><a class="btn primary" id="repoLink" href="#configuracao" target="_self">Ver repositório ↗</a><a class="btn" id="actionsLink" href="#configuracao">Ver GitHub Actions ↗</a><a class="btn" href="#pipeline">Explorar pipeline ↓</a></div></div>
+    <div class="hero-visual" aria-label="Símbolo infinito DevOps animado representando integração e entrega contínuas" role="img">
+      <svg viewBox="0 0 500 290" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="infinity-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#448aff"/><stop offset="52%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#3dd6a1"/></linearGradient><filter id="infinity-blur" x="-25%" y="-40%" width="150%" height="180%"><feGaussianBlur stdDeviation="6"/></filter></defs>
+        <path class="infinity-glow" d="M250 145 C190 55 110 35 75 95 C10 205 150 275 250 145 C350 15 490 85 430 195 C390 265 310 235 250 145"/>
+        <path class="infinity-track" d="M250 145 C190 55 110 35 75 95 C10 205 150 275 250 145 C350 15 490 85 430 195 C390 265 310 235 250 145"/>
+        <path class="infinity-flow" d="M250 145 C190 55 110 35 75 95 C10 205 150 275 250 145 C350 15 490 85 430 195 C390 265 310 235 250 145"/>
+        <text class="infinity-label" x="132" y="152" text-anchor="middle">DEV</text><text class="infinity-label" x="368" y="152" text-anchor="middle">OPS</text>
+      </svg>
+      <div class="infinity-caption">CONTINUOUS INTEGRATION <span>•</span> CONTINUOUS DELIVERY</div>
+    </div>
+  </section>
   <section class="section" id="dashboard"><h2>Visão geral</h2><p class="hint">Indicadores consultados no GitHub quando o repositório estiver configurado e público.</p><div class="cards">
     <article class="card"><div class="label">Última execução</div><div class="value status"><span class="dot wait" id="statusDot"></span><span id="runStatus">Não configurado</span></div><div class="detail" id="statusDetail">Configure o repositório abaixo</div></article>
     <article class="card"><div class="label">Branch monitorada</div><div class="value mono" id="branchValue">main</div><div class="detail">Gatilho: push</div></article>
@@ -34,7 +48,7 @@
 <footer class="footer"><div class="wrap"><span>Projeto Final DevOps • CI/CD com GitHub Actions</span><span>Feito com HTML, CSS e JavaScript</span></div></footer>
 <script>
   // CONFIGURAÇÃO: substitua pelos dados do seu repositório público.
-  const OWNER = 'SEU_USUARIO';
+  const OWNER = 'Fredy-Neugebauer';
   const REPO = 'meu-site-devops';
   const BRANCH = 'main';
   const WORKFLOW = 'pipeline.yml';
