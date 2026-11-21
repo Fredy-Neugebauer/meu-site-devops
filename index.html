@@ -1,10 +1,161 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="pt-BR">
 <head>
-<title>DevOps na prática</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dashboard do projeto final de DevOps: GitHub Actions e Cloudflare.">
+  <title>DevOps Pipeline | Projeto Final</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080f1f;--panel:#111c31;--panel2:#17243a;--border:#293750;--text:#f1f5ff;--muted:#9baec8;--blue:#5fa8ff;--green:#3dd6a1;--amber:#ffcd70;--red:#ff7f90}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 80% 0%,#17345c 0%,transparent 32%),var(--bg);color:var(--text);line-height:1.5}
+    a{color:inherit;text-decoration:none}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+    .wrap{width:min(1160px,calc(100% - 36px));margin:auto}.top{border-bottom:1px solid var(--border);background:#091224c9;backdrop-filter:blur(12px)}.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0}.brand{font-weight:800;font-size:19px;letter-spacing:-.5px}.brand span{color:var(--green)}.navlinks{display:flex;gap:20px;flex-wrap:wrap;color:var(--muted);font-size:14px}.navlinks a:hover{color:white}
+    .hero{padding:74px 0 40px}.eyebrow{color:var(--green);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.hero h1{font-size:clamp(34px,5.4vw,64px);letter-spacing:-2px;line-height:1.08;margin:15px 0}.hero h1 span{color:var(--blue)}.hero p{color:var(--muted);max-width:710px;font-size:17px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 17px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);font-weight:650;font-size:14px;transition:.2s}.btn:hover{transform:translateY(-2px);border-color:var(--blue)}.btn.primary{background:var(--blue);color:#07111f;border-color:var(--blue)}
+    .section{margin:36px 0}.section h2{font-size:23px;letter-spacing:-.5px;margin:0 0 7px}.section .hint{color:var(--muted);margin:0 0 18px;font-size:14px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{border:1px solid var(--border);border-radius:15px;background:linear-gradient(145deg,var(--panel),#0e182a);padding:21px;min-width:0}.card .label{color:var(--muted);font-size:13px}.card .value{font-size:22px;font-weight:800;overflow-wrap:anywhere;margin-top:12px}.card .detail{font-size:12px;color:var(--muted);margin-top:7px}.status{display:inline-flex;align-items:center;gap:7px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--amber)}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}.dot.wait{background:var(--amber)}
+    .pipeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.step{position:relative;padding:22px 16px;background:var(--panel);border:1px solid var(--border);border-radius:14px}.step .num{font-size:12px;color:var(--blue);font-weight:800}.step h3{font-size:18px;margin:10px 0 6px}.step p{color:var(--muted);font-size:13px;margin:0}.step:not(:last-child)::after{content:'→';position:absolute;right:-12px;top:43%;z-index:2;color:var(--green);font-weight:900;background:var(--bg);padding:0 2px}
+    .two{display:grid;grid-template-columns:1.4fr 1fr;gap:15px}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.info{display:grid;grid-template-columns:125px 1fr;gap:12px;border-bottom:1px solid var(--border);padding:12px 0;font-size:14px}.info:last-child{border-bottom:0}.info dt{color:var(--muted)}.info dd{margin:0;overflow-wrap:anywhere}.tech{display:flex;flex-wrap:wrap;gap:9px}.tag{background:#20304a;color:#d6e8ff;border:1px solid #344965;padding:7px 11px;border-radius:8px;font-size:13px}.note{border-left:3px solid var(--blue);padding:12px 15px;background:#14243a;color:var(--muted);font-size:13px;border-radius:0 9px 9px 0;margin-top:18px}.footer{border-top:1px solid var(--border);padding:25px 0;color:var(--muted);font-size:13px;margin-top:60px}.footer .wrap{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+    .hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr);align-items:center;gap:35px;min-height:410px}.hero-copy{min-width:0}.hero-visual{width:100%;max-width:470px;justify-self:center;position:relative;filter:drop-shadow(0 0 25px #1c78dd22)}.hero-visual svg{width:100%;height:auto;display:block;overflow:visible}.infinity-track{fill:none;stroke:#223657;stroke-width:13;stroke-linecap:round}.infinity-glow{fill:none;stroke:url(#infinity-gradient);stroke-width:17;filter:url(#infinity-blur);opacity:.32}.infinity-flow{fill:none;stroke:url(#infinity-gradient);stroke-width:13;stroke-linecap:round;stroke-dasharray:105 880;animation:infinity-run 3.4s linear infinite}.infinity-label{font-size:24px;font-weight:800;fill:#e6f0ff;letter-spacing:2px}.infinity-caption{text-align:center;font-size:10px;font-weight:700;letter-spacing:2px;color:#8ba6c8;margin-top:-10px}.infinity-caption span{color:#3dd6a1}@keyframes infinity-run{to{stroke-dashoffset:-985}}@media(prefers-reduced-motion:reduce){.infinity-flow{animation:none;stroke-dasharray:none}}
+    @media(max-width:950px){.hero{grid-template-columns:1fr}.hero-visual{max-width:390px}.hero{gap:12px}}
+    @media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.pipeline{grid-template-columns:repeat(2,1fr)}.step::after{display:none}.two{grid-template-columns:1fr}.hero{padding-top:50px}}
+    @media(max-width:480px){.nav{align-items:flex-start;flex-direction:column}.cards,.pipeline{grid-template-columns:1fr}.info{grid-template-columns:1fr;gap:2px}.hero h1{letter-spacing:-1px}}
+
+    /* Minigame pixel art, integrado ao banner */
+    .game-panel{max-width:480px;filter:none;border:1px solid #34517c;border-radius:16px;background:#0c1730;overflow:hidden;box-shadow:0 20px 55px #0005,0 0 32px #3187ff16}
+    .game-head,.game-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;font-size:11px;font-weight:800;color:#dbeafe}
+    .game-head{background:#142643;color:#8fe8ff;letter-spacing:.4px}.game-head span:last-child{color:#ffd76b;white-space:nowrap}
+    #devopsGame{width:100%;height:auto;display:block;image-rendering:pixelated;background:#0b1732;touch-action:none}
+    .game-bottom{font-size:11px;color:#b7c9e7;min-height:43px}.game-bottom button,.game-controls button{background:#24466c;color:#fff;border:1px solid #507aa5;border-radius:8px;cursor:pointer;font:700 12px inherit;padding:7px 9px}
+    .game-controls{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 12px 12px;color:#a8bddc;font-size:11px}.game-controls button{min-width:56px;min-height:38px;font-size:19px;touch-action:none;user-select:none}
+    .game-controls button:active{background:#3277bc}
+    @media(max-width:480px){.game-head{font-size:10px}.game-controls span{font-size:10px}}
+  </style>
 </head>
 <body>
-<h1>🚀 Meu primeiro CI/CD</h1>
-<p>Deploy automático com Cloudflare Pages</p>
+<header class="top"><div class="wrap nav"><a class="brand" href="#inicio">&lt;DevOps<span>/</span>Pipeline&gt;</a><nav class="navlinks" aria-label="Navegação"><a href="#dashboard">Dashboard</a><a href="#pipeline">Pipeline</a><a href="#arquitetura">Arquitetura</a></nav></div></header>
+<main class="wrap" id="inicio">
+  <section class="hero">
+    <div class="hero-copy"><div class="eyebrow">Projeto final • DevOps</div><h1>Integração e entrega<br><span>contínua na prática.</span></h1><p>Uma aplicação estática publicada na Cloudflare, com versionamento Git e validação automatizada via GitHub Actions. Acompanhe abaixo a execução mais recente do workflow.</p><div class="actions"><a class="btn primary" id="repoLink" href="#configuracao" target="_self">Ver repositório ↗</a><a class="btn" id="actionsLink" href="#configuracao">Ver GitHub Actions ↗</a><a class="btn" href="#pipeline">Explorar pipeline ↓</a></div></div>
+    <div class="hero-visual game-panel" aria-label="Minigame de entregas DevOps">
+      <div class="game-head"><span>🎮 MISSÃO: ENTREGAR TRABALHOS</span><span id="gameScore">⭐ 0 / 5</span></div>
+      <canvas id="devopsGame" width="480" height="290" aria-label="Jogo de plataforma em pixel art: professor lança trabalhos e aluno coleta usando setas ou botões"></canvas>
+      <div class="game-bottom"><span id="gameMessage" aria-live="polite">Colete 5 trabalhos para concluir o deploy!</span><button id="gameRestart" type="button">↻ Reiniciar</button></div>
+      <div class="game-controls"><button type="button" id="gameLeft" aria-label="Mover aluno para esquerda">◀</button><span>← → ou A / D para mover</span><button type="button" id="gameRight" aria-label="Mover aluno para direita">▶</button></div>
+    </div>
+  </section>
+  <section class="section" id="dashboard"><h2>Visão geral</h2><p class="hint">Indicadores consultados no GitHub quando o repositório estiver configurado e público.</p><div class="cards">
+    <article class="card"><div class="label">Última execução</div><div class="value status"><span class="dot wait" id="statusDot"></span><span id="runStatus">Não configurado</span></div><div class="detail" id="statusDetail">Configure o repositório abaixo</div></article>
+    <article class="card"><div class="label">Branch monitorada</div><div class="value mono" id="branchValue">main</div><div class="detail">Gatilho: push</div></article>
+    <article class="card"><div class="label">Último commit</div><div class="value mono" id="commitValue">—</div><div class="detail" id="commitDetail">Aguardando consulta</div></article>
+    <article class="card"><div class="label">Execução iniciada</div><div class="value" id="timeValue">—</div><div class="detail" id="timeDetail">Data e horário da execução</div></article>
+  </div></section>
+  <section class="section" id="pipeline"><h2>Etapas do pipeline</h2><p class="hint">Fluxo definido no arquivo <code>.github/workflows/pipeline.yml</code>.</p><div class="pipeline"><article class="step"><div class="num">01 / SETUP</div><h3>⚙️ Preparação</h3><p>Checkout do código e listagem dos arquivos.</p></article><article class="step"><div class="num">02 / VALIDATION</div><h3>✅ Validação</h3><p>Verifica se o arquivo index.html existe.</p></article><article class="step"><div class="num">03 / BUILD</div><h3>📦 Build</h3><p>Copia o site estático para a pasta dist/.</p></article><article class="step"><div class="num">04 / DEPLOY</div><h3>🚀 Publicação</h3><p>Job informativo. A publicação é feita separadamente pela integração Cloudflare–Git, se configurada.</p></article></div></section>
+  <section class="section" id="arquitetura"><h2>Arquitetura e tecnologias</h2><p class="hint">Como as ferramentas trabalham juntas neste projeto.</p><div class="two"><article class="card"><h3>Fluxo de entrega</h3><p class="hint">Desenvolvedor → Git push → GitHub → GitHub Actions (setup, validação, build e aviso) → Cloudflare (integração Git independente) → Site online.</p><div class="tech"><span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">Git</span><span class="tag">GitHub</span><span class="tag">GitHub Actions</span><span class="tag">Cloudflare</span></div><div class="note">O sucesso do workflow não comprova, por si só, que a publicação na Cloudflare foi concluída. Verifique o status do deploy no painel Cloudflare.</div></article><article class="card" id="configuracao"><h3>Dados do projeto</h3><dl><div class="info"><dt>Repositório</dt><dd id="repoValue">Configure OWNER e REPO no JavaScript</dd></div><div class="info"><dt>Workflow</dt><dd class="mono">pipeline.yml</dd></div><div class="info"><dt>Hospedagem</dt><dd>Cloudflare</dd></div><div class="info"><dt>Site</dt><dd><a href="https://meu-site-devops.fredybenitees.workers.dev" target="_blank" rel="noopener noreferrer">meu-site-devops.fredybenitees.workers.dev ↗</a></dd></div></dl></article></div></section>
+</main>
+<footer class="footer"><div class="wrap"><span>Projeto Final DevOps • CI/CD com GitHub Actions</span><span>Feito com HTML, CSS e JavaScript</span></div></footer>
+<script>
+  // CONFIGURAÇÃO: substitua pelos dados do seu repositório público.
+  const OWNER = 'Fredy-Neugebauer';
+  const REPO = 'meu-site-devops';
+  const BRANCH = 'main';
+  const WORKFLOW = 'pipeline.yml';
+  const configured = OWNER !== 'SEU_USUARIO' && REPO !== 'SEU_REPOSITORIO';
+  const el = id => document.getElementById(id);
+  el('branchValue').textContent = BRANCH;
+  if (configured) {
+    const repoUrl = `https://github.com/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}`;
+    el('repoLink').href = repoUrl;
+    el('repoLink').target = '_blank';
+    el('repoLink').rel = 'noopener noreferrer';
+    el('actionsLink').href = repoUrl + '/actions';
+    el('actionsLink').target = '_blank';
+    el('actionsLink').rel = 'noopener noreferrer';
+    el('repoValue').textContent = `${OWNER}/${REPO}`;
+    async function updateRun() {
+      try {
+        const url = `https://api.github.com/repos/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}/actions/workflows/${encodeURIComponent(WORKFLOW)}/runs?branch=${encodeURIComponent(BRANCH)}&per_page=1`;
+        const response = await fetch(url, {headers: {'Accept':'application/vnd.github+json'}});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const run = data.workflow_runs?.[0];
+        if (!run) {el('runStatus').textContent='Sem execuções';el('statusDetail').textContent='Nenhuma execução encontrada';return;}
+        const result = run.status !== 'completed' ? 'Em andamento' : run.conclusion === 'success' ? 'Sucesso' : run.conclusion === 'failure' ? 'Falha' : run.conclusion === 'cancelled' ? 'Cancelado' : 'Concluído';
+        el('runStatus').textContent = result;
+        el('statusDot').className = 'dot ' + (run.conclusion === 'success' ? 'ok' : run.conclusion === 'failure' ? 'bad' : 'wait');
+        el('statusDetail').textContent = `Execução #${run.run_number} • ${run.event}`;
+        el('commitValue').textContent = run.head_sha?.slice(0,7) || '—';
+        el('commitDetail').textContent = (run.head_commit?.message || 'Mensagem indisponível').split('\n')[0].slice(0,85);
+        const date = new Date(run.run_started_at || run.created_at);
+        el('timeValue').textContent = date.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'America/Sao_Paulo'});
+        el('timeDetail').textContent = date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}) + ' (Brasília)';
+      } catch (err) {
+        el('runStatus').textContent = 'Indisponível';
+        el('statusDetail').textContent = 'Confira repositório público, nome do workflow e limite da API';
+        console.warn('Falha ao consultar GitHub Actions:', err);
+      }
+    }
+    updateRun();
+  }
+
+  // JOGO: animação original em Canvas, sem imagens externas ou bibliotecas.
+  (() => {
+    const canvas = document.getElementById('devopsGame');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('gameScore');
+    const messageEl = document.getElementById('gameMessage');
+    const W=480,H=290,ground=255;
+    let playerX=235,score=0,misses=0,done=false,items=[],particles=[],spawn=0,last=0,clock=0;
+    const keys={left:false,right:false};
+    function reset(){playerX=235;score=0;misses=0;done=false;items=[];particles=[];spawn=0;scoreEl.textContent='⭐ 0 / 5';messageEl.textContent='Colete 5 trabalhos para concluir o deploy!';}
+    document.getElementById('gameRestart').addEventListener('click',reset);
+    function control(button,side){
+      const el=document.getElementById(button);
+      el.addEventListener('pointerdown',e=>{e.preventDefault();keys[side]=true;try{el.setPointerCapture(e.pointerId)}catch(_){}});
+      ['pointerup','pointercancel','lostpointercapture','pointerleave'].forEach(ev=>el.addEventListener(ev,()=>keys[side]=false));
+    }
+    control('gameLeft','left');control('gameRight','right');
+    window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','a','A','d','D'].includes(e.key)&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){keys[e.key==='ArrowLeft'||e.key.toLowerCase()==='a'?'left':'right']=true;e.preventDefault();}});
+    window.addEventListener('keyup',e=>{if(['ArrowLeft','ArrowRight','a','A','d','D'].includes(e.key)){keys[e.key==='ArrowLeft'||e.key.toLowerCase()==='a'?'left':'right']=false;}});
+    window.addEventListener('blur',()=>{keys.left=false;keys.right=false});
+    const rect=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+    function label(txt,x,y,color='#fff',size=12){ctx.fillStyle=color;ctx.font=`bold ${size}px monospace`;ctx.textAlign='center';ctx.fillText(txt,x,y);}
+    function professor(x,y){
+      rect(x+9,y,19,18,'#ffd4a2');rect(x+7,y-4,23,7,'#475569');rect(x+3,y+18,31,27,'#8257c8');rect(x+8,y+45,9,13,'#263650');rect(x+22,y+45,9,13,'#263650');
+      rect(x+13,y+7,3,3,'#182238');rect(x+23,y+7,3,3,'#182238');rect(x+17,y+14,8,2,'#9f513a');rect(x+34,y+23,11,7,'#ffd4a2');
+    }
+    function student(x,y){
+      rect(x+8,y,18,17,'#f2bf8b');rect(x+5,y-5,24,8,'#1c2538');rect(x+10,y+7,3,3,'#182238');rect(x+22,y+7,3,3,'#182238');
+      rect(x+3,y+17,30,27,'#3b82f6');rect(x+7,y+44,9,12,'#243451');rect(x+23,y+44,9,12,'#243451');rect(x-2,y+20,6,17,'#f2bf8b');rect(x+33,y+20,6,17,'#f2bf8b');
+    }
+    function paper(x,y){rect(x,y,19,23,'#f8fafc');rect(x+3,y+5,12,2,'#54a5e9');rect(x+3,y+10,10,2,'#54a5e9');rect(x+3,y+15,12,2,'#22c55e');rect(x+15,y,4,5,'#c5d5e7')}
+    function frame(t){
+      const dt=Math.min((t-last)/1000||0,.05);last=t;clock+=dt;
+      if(!done){
+        playerX=Math.max(4,Math.min(W-39,playerX+(Number(keys.right)-Number(keys.left))*225*dt));
+        spawn+=dt;
+        if(spawn>1.35){spawn=0;items.push({x:70+Math.random()*325,y:90,vy:42+score*6,drift:(Math.random()-.5)*25});}
+        for(let i=items.length-1;i>=0;i--){const it=items[i];it.y+=it.vy*dt;it.x+=it.drift*dt;
+          if(it.y+23>=ground-55&&it.y<ground-16&&it.x+19>playerX&&it.x<playerX+37){items.splice(i,1);score++;scoreEl.textContent=`⭐ ${score} / 5`;messageEl.textContent=score>=5?'🏆 FASE CONCLUÍDA — DEPLOY SUCCESS!':'✅ Trabalho entregue! +1 commit';for(let j=0;j<9;j++)particles.push({x:playerX+18,y:ground-50,vx:(Math.random()-.5)*110,vy:-Math.random()*120,life:.7});if(score>=5)done=true;}
+          else if(it.y>ground){items.splice(i,1);misses++;if(misses%3===0)messageEl.textContent='📄 Trabalho perdido! Continue tentando.';}
+        }
+      }
+      for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=180*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}
+      // Cenário pixel art
+      ctx.clearRect(0,0,W,H);rect(0,0,W,H,'#101e3c');
+      for(let i=0;i<23;i++){let x=(i*97+19)%W,y=(i*47+17)%165;rect(x,y,2,2,'#37547f')}
+      rect(0,184,W,5,'#203e64');rect(0,188,W,5,'#294e70');
+      for(let i=0;i<8;i++){const x=i*66-8;rect(x,196,43,58,'#152c50');rect(x+8,206,7,11,'#376a95');rect(x+25,206,7,11,'#376a95')}
+      rect(0,ground,W,H-ground,'#285d46');rect(0,ground,W,8,'#3ec47d');for(let x=0;x<W;x+=34)rect(x,ground+13,18,3,'#367e55');
+      // Plataforma do professor
+      rect(20,76,108,10,'#a66b45');rect(20,85,108,6,'#65472f');rect(30,91,8,10,'#65472f');rect(108,91,8,10,'#65472f');
+      professor(49,17);label('Prof. Erik Filippini',94,13,'#f9df91',10);
+      // Entregas caindo e aluno
+      items.forEach(it=>paper(it.x,it.y));student(playerX,ground-56);label('ALUNO',playerX+18,ground-65,'#a8e9ff',11);
+      particles.forEach(p=>rect(p.x,p.y,4,4,p.life>.35?'#fbbf24':'#34d399'));
+      if(done){rect(52,104,376,78,'#0b1732');ctx.strokeStyle='#34d399';ctx.lineWidth=3;ctx.strokeRect(52,104,376,78);label('🏆 DEPLOY SUCCESS!',240,139,'#65f4b0',22);label('Todos os trabalhos entregues!',240,162,'#e0ecff',12)}
+      requestAnimationFrame(frame);
+    }
+    reset();requestAnimationFrame(frame);
+  })();
+</script>
 </body>
 </html>
