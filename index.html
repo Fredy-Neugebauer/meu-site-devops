@@ -18,6 +18,16 @@
     @media(max-width:950px){.hero{grid-template-columns:1fr}.hero-visual{max-width:390px}.hero{gap:12px}}
     @media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.pipeline{grid-template-columns:repeat(2,1fr)}.step::after{display:none}.two{grid-template-columns:1fr}.hero{padding-top:50px}}
     @media(max-width:480px){.nav{align-items:flex-start;flex-direction:column}.cards,.pipeline{grid-template-columns:1fr}.info{grid-template-columns:1fr;gap:2px}.hero h1{letter-spacing:-1px}}
+
+    /* Minigame pixel art, integrado ao banner */
+    .game-panel{max-width:480px;filter:none;border:1px solid #34517c;border-radius:16px;background:#0c1730;overflow:hidden;box-shadow:0 20px 55px #0005,0 0 32px #3187ff16}
+    .game-head,.game-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;font-size:11px;font-weight:800;color:#dbeafe}
+    .game-head{background:#142643;color:#8fe8ff;letter-spacing:.4px}.game-head span:last-child{color:#ffd76b;white-space:nowrap}
+    #devopsGame{width:100%;height:auto;display:block;image-rendering:pixelated;background:#0b1732;touch-action:none}
+    .game-bottom{font-size:11px;color:#b7c9e7;min-height:43px}.game-bottom button,.game-controls button{background:#24466c;color:#fff;border:1px solid #507aa5;border-radius:8px;cursor:pointer;font:700 12px inherit;padding:7px 9px}
+    .game-controls{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 12px 12px;color:#a8bddc;font-size:11px}.game-controls button{min-width:56px;min-height:38px;font-size:19px;touch-action:none;user-select:none}
+    .game-controls button:active{background:#3277bc}
+    @media(max-width:480px){.game-head{font-size:10px}.game-controls span{font-size:10px}}
   </style>
 </head>
 <body>
@@ -25,15 +35,11 @@
 <main class="wrap" id="inicio">
   <section class="hero">
     <div class="hero-copy"><div class="eyebrow">Projeto final • DevOps</div><h1>Integração e entrega<br><span>contínua na prática.</span></h1><p>Uma aplicação estática publicada na Cloudflare, com versionamento Git e validação automatizada via GitHub Actions. Acompanhe abaixo a execução mais recente do workflow.</p><div class="actions"><a class="btn primary" id="repoLink" href="#configuracao" target="_self">Ver repositório ↗</a><a class="btn" id="actionsLink" href="#configuracao">Ver GitHub Actions ↗</a><a class="btn" href="#pipeline">Explorar pipeline ↓</a></div></div>
-    <div class="hero-visual" aria-label="Símbolo infinito DevOps animado representando integração e entrega contínuas" role="img">
-      <svg viewBox="0 0 500 290" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs><linearGradient id="infinity-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#448aff"/><stop offset="52%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#3dd6a1"/></linearGradient><filter id="infinity-blur" x="-25%" y="-40%" width="150%" height="180%"><feGaussianBlur stdDeviation="6"/></filter></defs>
-        <path class="infinity-glow" d="M250 145 C190 55 110 35 75 95 C10 205 150 275 250 145 C350 15 490 85 430 195 C390 265 310 235 250 145"/>
-        <path class="infinity-track" d="M250 145 C190 55 110 35 75 95 C10 205 150 275 250 145 C350 15 490 85 430 195 C390 265 310 235 250 145"/>
-        <path class="infinity-flow" d="M250 145 C190 55 110 35 75 95 C10 205 150 275 250 145 C350 15 490 85 430 195 C390 265 310 235 250 145"/>
-        <text class="infinity-label" x="132" y="152" text-anchor="middle">DEV</text><text class="infinity-label" x="368" y="152" text-anchor="middle">OPS</text>
-      </svg>
-      <div class="infinity-caption">CONTINUOUS INTEGRATION <span>•</span> CONTINUOUS DELIVERY</div>
+    <div class="hero-visual game-panel" aria-label="Minigame de entregas DevOps">
+      <div class="game-head"><span>🎮 MISSÃO: ENTREGAR TRABALHOS</span><span id="gameScore">⭐ 0 / 5</span></div>
+      <canvas id="devopsGame" width="480" height="290" aria-label="Jogo de plataforma em pixel art: professor lança trabalhos e aluno coleta usando setas ou botões"></canvas>
+      <div class="game-bottom"><span id="gameMessage" aria-live="polite">Colete 5 trabalhos para concluir o deploy!</span><button id="gameRestart" type="button">↻ Reiniciar</button></div>
+      <div class="game-controls"><button type="button" id="gameLeft" aria-label="Mover aluno para esquerda">◀</button><span>← → ou A / D para mover</span><button type="button" id="gameRight" aria-label="Mover aluno para direita">▶</button></div>
     </div>
   </section>
   <section class="section" id="dashboard"><h2>Visão geral</h2><p class="hint">Indicadores consultados no GitHub quando o repositório estiver configurado e público.</p><div class="cards">
@@ -89,6 +95,67 @@
     }
     updateRun();
   }
+
+  // JOGO: animação original em Canvas, sem imagens externas ou bibliotecas.
+  (() => {
+    const canvas = document.getElementById('devopsGame');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('gameScore');
+    const messageEl = document.getElementById('gameMessage');
+    const W=480,H=290,ground=255;
+    let playerX=235,score=0,misses=0,done=false,items=[],particles=[],spawn=0,last=0,clock=0;
+    const keys={left:false,right:false};
+    function reset(){playerX=235;score=0;misses=0;done=false;items=[];particles=[];spawn=0;scoreEl.textContent='⭐ 0 / 5';messageEl.textContent='Colete 5 trabalhos para concluir o deploy!';}
+    document.getElementById('gameRestart').addEventListener('click',reset);
+    function control(button,side){
+      const el=document.getElementById(button);
+      el.addEventListener('pointerdown',e=>{e.preventDefault();keys[side]=true;try{el.setPointerCapture(e.pointerId)}catch(_){}});
+      ['pointerup','pointercancel','lostpointercapture','pointerleave'].forEach(ev=>el.addEventListener(ev,()=>keys[side]=false));
+    }
+    control('gameLeft','left');control('gameRight','right');
+    window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','a','A','d','D'].includes(e.key)&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){keys[e.key==='ArrowLeft'||e.key.toLowerCase()==='a'?'left':'right']=true;e.preventDefault();}});
+    window.addEventListener('keyup',e=>{if(['ArrowLeft','ArrowRight','a','A','d','D'].includes(e.key)){keys[e.key==='ArrowLeft'||e.key.toLowerCase()==='a'?'left':'right']=false;}});
+    window.addEventListener('blur',()=>{keys.left=false;keys.right=false});
+    const rect=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)};
+    function label(txt,x,y,color='#fff',size=12){ctx.fillStyle=color;ctx.font=`bold ${size}px monospace`;ctx.textAlign='center';ctx.fillText(txt,x,y);}
+    function professor(x,y){
+      rect(x+9,y,19,18,'#ffd4a2');rect(x+7,y-4,23,7,'#475569');rect(x+3,y+18,31,27,'#8257c8');rect(x+8,y+45,9,13,'#263650');rect(x+22,y+45,9,13,'#263650');
+      rect(x+13,y+7,3,3,'#182238');rect(x+23,y+7,3,3,'#182238');rect(x+17,y+14,8,2,'#9f513a');rect(x+34,y+23,11,7,'#ffd4a2');
+    }
+    function student(x,y){
+      rect(x+8,y,18,17,'#f2bf8b');rect(x+5,y-5,24,8,'#1c2538');rect(x+10,y+7,3,3,'#182238');rect(x+22,y+7,3,3,'#182238');
+      rect(x+3,y+17,30,27,'#3b82f6');rect(x+7,y+44,9,12,'#243451');rect(x+23,y+44,9,12,'#243451');rect(x-2,y+20,6,17,'#f2bf8b');rect(x+33,y+20,6,17,'#f2bf8b');
+    }
+    function paper(x,y){rect(x,y,19,23,'#f8fafc');rect(x+3,y+5,12,2,'#54a5e9');rect(x+3,y+10,10,2,'#54a5e9');rect(x+3,y+15,12,2,'#22c55e');rect(x+15,y,4,5,'#c5d5e7')}
+    function frame(t){
+      const dt=Math.min((t-last)/1000||0,.05);last=t;clock+=dt;
+      if(!done){
+        playerX=Math.max(4,Math.min(W-39,playerX+(Number(keys.right)-Number(keys.left))*225*dt));
+        spawn+=dt;
+        if(spawn>1.35){spawn=0;items.push({x:70+Math.random()*325,y:90,vy:42+score*6,drift:(Math.random()-.5)*25});}
+        for(let i=items.length-1;i>=0;i--){const it=items[i];it.y+=it.vy*dt;it.x+=it.drift*dt;
+          if(it.y+23>=ground-55&&it.y<ground-16&&it.x+19>playerX&&it.x<playerX+37){items.splice(i,1);score++;scoreEl.textContent=`⭐ ${score} / 5`;messageEl.textContent=score>=5?'🏆 FASE CONCLUÍDA — DEPLOY SUCCESS!':'✅ Trabalho entregue! +1 commit';for(let j=0;j<9;j++)particles.push({x:playerX+18,y:ground-50,vx:(Math.random()-.5)*110,vy:-Math.random()*120,life:.7});if(score>=5)done=true;}
+          else if(it.y>ground){items.splice(i,1);misses++;if(misses%3===0)messageEl.textContent='📄 Trabalho perdido! Continue tentando.';}
+        }
+      }
+      for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=180*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}
+      // Cenário pixel art
+      ctx.clearRect(0,0,W,H);rect(0,0,W,H,'#101e3c');
+      for(let i=0;i<23;i++){let x=(i*97+19)%W,y=(i*47+17)%165;rect(x,y,2,2,'#37547f')}
+      rect(0,184,W,5,'#203e64');rect(0,188,W,5,'#294e70');
+      for(let i=0;i<8;i++){const x=i*66-8;rect(x,196,43,58,'#152c50');rect(x+8,206,7,11,'#376a95');rect(x+25,206,7,11,'#376a95')}
+      rect(0,ground,W,H-ground,'#285d46');rect(0,ground,W,8,'#3ec47d');for(let x=0;x<W;x+=34)rect(x,ground+13,18,3,'#367e55');
+      // Plataforma do professor
+      rect(20,76,108,10,'#a66b45');rect(20,85,108,6,'#65472f');rect(30,91,8,10,'#65472f');rect(108,91,8,10,'#65472f');
+      professor(49,17);label('Prof. Erik Filippini',94,13,'#f9df91',10);
+      // Entregas caindo e aluno
+      items.forEach(it=>paper(it.x,it.y));student(playerX,ground-56);label('ALUNO',playerX+18,ground-65,'#a8e9ff',11);
+      particles.forEach(p=>rect(p.x,p.y,4,4,p.life>.35?'#fbbf24':'#34d399'));
+      if(done){rect(52,104,376,78,'#0b1732');ctx.strokeStyle='#34d399';ctx.lineWidth=3;ctx.strokeRect(52,104,376,78);label('🏆 DEPLOY SUCCESS!',240,139,'#65f4b0',22);label('Todos os trabalhos entregues!',240,162,'#e0ecff',12)}
+      requestAnimationFrame(frame);
+    }
+    reset();requestAnimationFrame(frame);
+  })();
 </script>
 </body>
 </html>
